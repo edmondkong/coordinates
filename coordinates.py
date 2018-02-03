@@ -2,40 +2,32 @@
 
 import json
 from random import uniform
+from geojson import Point
 
-countries_json = json.load(open('countries.geo.json'))
 
-countries_data = countries_json['features']
+def load_countries_data():
+    return json.load(open('countries.geo.json'))['features']
 
 
 def list_available_countries(data):
     return map(lambda country: country['id'], data)
 
 
-def get_selected_country_data(data, country):
-    return next(x for x in data if x['id'] == country)
+def get_country_polygon(data, country):
+    return next(x for x in data if x['id'] == country)['geometry']['coordinates']
 
 
-def get_random_coordinates_within_bounds(bounds):
-    x_coords = map(lambda bound: bound[0], bounds[0])
-    y_coords = map(lambda bound: bound[1], bounds[0])
+def get_random_point_within_polygon(polygon):
+    x_points = map(lambda bound: bound[0], polygon[0])
+    y_points = map(lambda bound: bound[1], polygon[0])
 
-    max_x = max(x_coords)
-    min_x = min(x_coords)
+    min_x = min(x_points)
+    max_x = max(x_points)
 
-    max_y = max(y_coords)
-    min_y = min(y_coords)
+    min_y = min(y_points)
+    max_y = max(y_points)
 
-    print(min_x, max_x)
-    print(min_y, max_y)
+    random_point = Point(uniform(min_x, max_x), uniform(min_y, max_y))
 
-    latitude = uniform(min_y, max_y)
-    longitude = uniform(min_x, max_x)
+    return random_point
 
-    print(latitude, longitude)
-    return latitude, longitude
-
-
-IRL_data = get_selected_country_data(countries_data, "DEU")
-IRL_bounds = IRL_data['geometry']['coordinates']
-get_random_coordinates_within_bounds(IRL_bounds)
